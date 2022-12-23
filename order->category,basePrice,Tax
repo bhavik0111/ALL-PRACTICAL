@@ -318,8 +318,8 @@ if (isset($_POST["submit"])) {
                 <?php
                     }
                 }
-                ?> '</select></td><td><input type="number" name="Price[]" class="Product_price" id="Product_price+rowcount+" Onchange="calculate(+rowcount+)" Readonly></td>' +
-                '<td><input type="number" name="Discount[]" id="Product_discount+rowcount+" Onchange="calculate(+rowcount+)"></td><td><input type="number" name="Qty[]" id="Product_qty+rowcount+" Onchange="calculate(+rowcount+)"></td><td><input type="number" name="Total[]" id="Product_total+rowcount+" Onchange="calculate(+rowcount+)" Readonly></td><td><a class="DeleteProduct">Delete</a></td></tr>';
+                ?> '</select></td><td><input type="number" name="Price[]" class="Product_price" id="Product_price'+rowcount+'" Onchange="calculate('+rowcount+')" Readonly></td>' +
+                '<td><input type="number" name="Discount[]" id="Product_discount'+rowcount+'" Onchange="calculate('+rowcount+')"></td><td><input type="number" name="Qty[]" id="Product_qty'+rowcount+'" Onchange="calculate('+rowcount+')"></td><td><input type="number" name="Total[]" id="Product_total'+rowcount+'" Onchange="calculate('+rowcount+')" Readonly></td><td><a class="DeleteProduct">Delete</a></td></tr>';
             console.log(html);
             $('.tr').last().after(html);
 
