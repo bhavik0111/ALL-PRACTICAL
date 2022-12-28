@@ -109,20 +109,29 @@ if (isset($_POST["submit"])) {
                                 <a href="order.php?action=Add" class="btn btn-outline-success">Add+</a>
                             </div> -->
 
+
+            <?php
+                $maxsql = "SELECT MAX(Order_ID) FROM order_master";
+                $maxresult = mysqli_query($conn, $maxsql);
+                $maxrow = $maxresult->fetch_assoc();
+                $orderno = $maxrow['MAX(Order_ID)'];
+                $nextorderno = str_pad($orderno + 1, 5, "0", STR_PAD_LEFT);
+            ?>
             <tr>
                 <th>Order_Number</th>
-                <td><input type="text" name="Order_Number" value="<?php echo $Order_Number; ?>">
+                <td><input type="text" name="Order_Number" value="<?php echo $nextorderno; ?>">
                     <span style="color:red"><?php if (isset($_SESSION['error']['Order_Number_error'])) {
                                                 echo '<br>' . $_SESSION['error']['Order_Number_error'];
                                                 unset($_SESSION['error']['Order_Number_error']);
                                             } ?></span>
+
 
                 </td>
             </tr>
 
             <tr>
                 <th>Date</th>
-                <td><input type="date" name="Date" value="<?php echo $Date; ?>">
+                <td><input type="date" name="Date" value="<?php echo date('Y-m-d'); ?>">
                     <span style="color:red"><?php if (isset($_SESSION['error']['Date_error'])) {
                                                 echo '<br>' . $_SESSION['error']['Date_error'];
                                                 unset($_SESSION['error']['Date_error']);
@@ -205,7 +214,8 @@ if (isset($_POST["submit"])) {
                 <th>Discount</th>
                 <th>Qty</th>
                 <th>Total</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
+                <td><button type="button" id="AddProduct">Add++</button></td>
             </tr>
 
             <tr class="tr">
@@ -225,17 +235,21 @@ if (isset($_POST["submit"])) {
 
                 <td><input type="number" name="Price[]" class="Product_price" id="Product_price1" Onchange="calculate(1)" Readonly></td>
 
-                <td><input type="number" name="Discount[]"  id="Product_discount1" Onchange="calculate(1)"></td>
+                <td><input type="number" name="Discount[]" id="Product_discount1" Onchange="calculate(1)"></td>
 
                 <td><input type="number" name="Qty[]" id="Product_qty1" Onchange="calculate(1)"></td>
 
-                <td><input type="number" name="Total[]"  id="Product_total1" Onchange="calculate(1)" Readonly></td>
+                <td><input type="number" name="Total[]" id="Product_total1" Onchange="calculate(1)" Readonly></td>
 
-                <td><button type="button" id="AddProduct">Add++</button></td>
+                <!-- <td><a class="btn btn-outline-danger" href="order.php?action=Delete&id=<?php echo  $row['id']; ?>">Delete</a></td> -->
+
+                <td><input type="button" name="DeleteProduct" value="Delete" id="DeleteProduct" class="DeleteProduct"></td>
+
             </tr>
 
             <tr>
                 <td colspan="6" align="center">
+                    <input type="text" id="totalproduct_row" name="totalproduct_row" value="1">                    
                     <input type="submit" name="submit">
                     <input type="reset" name="clear" value="clear">
                 </td>
@@ -248,6 +262,25 @@ if (isset($_POST["submit"])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js"></script>
 
     <script>
+
+
+
+
+                                                        // let lineNo = 1;
+                                                        $(document).ready(function () 
+                                                        {
+                                                            $("#AddProduct").click(function () 
+                                                            {
+                                                                //markup = "<tr> class="tr" </tr>";
+                                                                tableBody = $('#AddProduct' );  
+                                                                tableBody.append(markup);
+                                                                //lineNo++;
+                                                            });
+                                                        }); 
+ 
+ 
+
+
         // GET Price frome Product_name.......................................................................
 
         $('.Product_name').on('change', function() {
@@ -279,7 +312,8 @@ if (isset($_POST["submit"])) {
 
         // Price = Discount = Qty = >  create Total..................................................
 
-        function calculate(row) {
+        function calculate(row) 
+        {
             var total = 0;
             var price = $('#Product_price' + row).val();
             var discount = $('#Product_discount' + row).val();
@@ -288,73 +322,105 @@ if (isset($_POST["submit"])) {
 
 
             $('#Product_total' + row).val(total);
+
             // alert(total);
         }
 
 
 
+        // AD++ row  delete ................................................................................
+
+
+        $(document).on('click', '.DeleteProduct', function () 
+        {
+            $(this).closest('tr').remove();
+            totalcountrow=parseInt($('#totalproduct_row').val())-1; 
+            $('#totalproduct_row').val(totalcountrow);
+            return false;
+            
+        });
+
+            
+
 
 
         // AD++................................................................................
 
-        $('#AddProduct').on('click', function() {
-                    
-                    var rowcount = 1;
-                        rowcount ++;
+                     // row count................
 
-            <?php
-                 $sql = "SELECT * FROM `product_master`";
-                  $result = mysqli_query($conn, $sql);   
-            ?>
+                    var totalrow=parseInt($('#totalproduct_row').val()); 
+                    var totalcountrow = totalrow;
 
-            var html = '<tr><td><select name="Product_name[]" class="Product_name"><option value="0">--select--</option>' +
+        $('#AddProduct').on('click', function() 
+        {
                 <?php
-                if ($result->num_rows > 0) 
-                {
-                    while ($row = $result->fetch_assoc()) 
+                    $sql = "SELECT * FROM `product_master`";
+                    $result = mysqli_query($conn, $sql);
+                ?>
+
+            totalrow++;
+            $('#totalproduct_row').val(totalrow);
+
+            var html = '<tr class="tr"><td><select name="Product_name[]" class="Product_name"><option value="0">--select--</option>' +
+                <?php
+                    if ($result->num_rows > 0) 
                     {
-                ?> '<option value="<?php echo $row['id']; ?>">' +
-                        '<?php echo $row['name']; ?></option>' +
-                <?php
+                        while ($row = $result->fetch_assoc()) 
+                        {
+                    ?> '<option value="<?php echo $row['id']; ?>">' +
+                            '<?php echo $row['name']; ?></option>' +
+                    <?php
+                        }
                     }
-                }
-                ?> '</select></td><td><input type="number" name="Price[]" class="Product_price" id="Product_price'+rowcount+'" Onchange="calculate('+rowcount+')" Readonly></td>' +
-                '<td><input type="number" name="Discount[]" id="Product_discount'+rowcount+'" Onchange="calculate('+rowcount+')"></td><td><input type="number" name="Qty[]" id="Product_qty'+rowcount+'" Onchange="calculate('+rowcount+')"></td><td><input type="number" name="Total[]" id="Product_total'+rowcount+'" Onchange="calculate('+rowcount+')" Readonly></td><td><a class="DeleteProduct">Delete</a></td></tr>';
-            console.log(html);
-            $('.tr').last().after(html);
+                ?> '</select></td><td><input type="number" name="Price[]" class="Product_price" id="Product_price' + totalrow + '" Onchange="calculate(' + totalrow + ')" Readonly></td>' +
+                '<td><input type="number" name="Discount[]" id="Product_discount' + totalrow + '" Onchange="calculate(' + totalrow + ')"></td><td><input type="number" name="Qty[]" id="Product_qty' + totalrow + '" Onchange="calculate(' + totalrow + ')"></td><td><input type="number" name="Total[]" id="Product_total' + totalrow + '" Onchange="calculate(' + totalrow + ')" Readonly></td><td><input type="button" name="Delete" value="Delete" id="DeleteProduct" class="DeleteProduct"></td></tr>';
+            
+                    
+
+                     // console.log(html);
+                     $('.tr').first().before(html);
+
+                    //row count ....................
+
+                    totalcountrow++;
+                     $('#totalproduct_row').val(parseInt(totalcountrow)); 
+                
+             
+                   
 
 
             // Add++ product & GET Price frome Product_name.......................................................................
 
-            $('.Product_name').on('change', function() {
-                var product_id = $(this).val();
-                var price_input = $(this).closest('td').siblings().find('.Product_price');
-                console.log(price_input);
 
-                $.ajax({
-                        type: 'POST',
-                        url: './getProductPrice.php',
-                        data: {
-                            'product_id': product_id
-                        }
-                    })
+                $('.Product_name').on('change', function() {
+                    var product_id = $(this).val();
+                    var price_input = $(this).closest('td').siblings().find('.Product_price');
+                    console.log(price_input);
 
-                    .done(function(response) {
-                        // demonstrate the response
-                        if (response.length) {
-                            var html = '';
-                            var res = $.parseJSON(response);
-                            price_input.val(res.price);
-                        }
-                    })
+                    $.ajax({
+                            type: 'POST',
+                            url: './getProductPrice.php',
+                            data: {
+                                'product_id': product_id
+                            }
+                        })
 
-                    .fail(function() {
-                        // if posting your form failed
-                        alert("Posting failed.");
-                    });
-            });
+                        .done(function(response) {
+                            // demonstrate the response
+                            if (response.length) {
+                                var html = '';
+                                var res = $.parseJSON(response);
+                                price_input.val(res.price);
+                            }
+                        })
+
+                        .fail(function() {
+                            // if posting your form failed
+                            alert("Posting failed.");
+                        });
+                });
         });
     </script>
 </body>
 
-</html>
+</html> 
