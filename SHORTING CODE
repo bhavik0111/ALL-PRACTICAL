@@ -7,15 +7,15 @@ last -> java script
 
 <?php
 
-$cus_name='';
-$cus_name_error='';
-$acount='';
-$order_id='';
+$customer_name='';
+$customer_name_error='';
+$action='';
+$order_id='';	
 $formaction=""
 
 if(issue(Ger['ac']))
 {
-$acount=Ger['ac'];	
+$action=Ger['ac'];	
 $formaction="action=".Ger['ac'];	
 }
 
@@ -27,19 +27,19 @@ $formaction .="&orde_id=".$order_id;
 if($order_id!='')
 {
 
-$cus_name = $row["cus_name"];
+$customer_name = $row["customer_name"];
 
 }
 if(isse(['bntsubmit']) && (bntsubmit="add" || bntsubmit="edit"))
 {
-	$cus_name=$_post['cus_name'];		
-	if($cus_name==''){
-		$cus_name_error='sfsd';	
+	$customer_name=$_post['customer_name'];		
+	if($customer_name==''){
+		$customer_name_error='sfsd';	
 	}
 	if(ntsubmit="add"){
 
 	}
-	else if(ntsubmit="edit" && $order_id!=''){
+	else if(bntsubmit="edit" && $order_id!=''){
 
 	}else{
 	   http://192.168.0.1/test/bhavik/Order/order.php
@@ -49,10 +49,11 @@ $listingquery="";
 
 if()
 {
-<form acio="order.php?<?php echo $formaction;?>">
-<input type=text value="<?php echo $cus_name;?>">
-if($cus_name_error!=''){ echo $cus_name_error;}
-<input type="submit" name="bntsubmit" value="<?php echo $acount;?>">
+<form action="order.php?<?php echo $formaction;?>">
+<input type=text value="<?php echo $customer_name;?>">
+
+if($customer_name_error!=''){ echo $customer_name_error;}
+<input type="submit" name="bntsubmit" value="<?php echo $action;?>">
 </form>
 }
 else{
